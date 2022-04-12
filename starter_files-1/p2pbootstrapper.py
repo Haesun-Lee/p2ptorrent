@@ -18,7 +18,6 @@ class p2pbootstrapper:
         # TODO:  Initialize the socket object and bind it to the IP and port, refer  #
         #        https://docs.python.org/3/howto/sockets.html on how to do this.     #
         ##############################################################################
-
         self.boots_socket = None
         self.clients = None  # None for now, will get updates as clients register
         
@@ -74,6 +73,8 @@ class p2pbootstrapper:
         ##############################################################################
         # TODO:  Return self.clients                                                 #
         ##############################################################################
+        
+        return self.clients             ###### revised by hs
         pass
 
     def start(self):

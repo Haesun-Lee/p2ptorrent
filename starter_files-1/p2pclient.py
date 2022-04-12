@@ -48,6 +48,7 @@ Obtain list of clients from Bootstrapper: (L)
 import socket
 import time
 import json
+import random
 
 class p2pclient:
     def __init__(self, client_id, content, actions):
@@ -57,10 +58,9 @@ class p2pclient:
         #       into the constructor                                                 #
         ##############################################################################
 
-        self.client_id = client_id
-        self.content = content
-        self.actions = actions  # this list of actions that the client needs to execute
-
+        self.client_id = client_id                                                          ###### revised by hs
+        self.content = content                                                              ###### revised by hs
+        self.actions = actions  # this list of actions that the client needs to execute     ###### revised by hs    
         self.content_originator_list = None  # None for now, it will be built eventually
 
         ##################################################################################
@@ -71,14 +71,17 @@ class p2pclient:
         #        https://docs.python.org/3/howto/sockets.html on how to do this.         #
         ##################################################################################
         
-        self.socket = None
-
+        #self.socket = None
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) ###### revised by hs
+        self.socket.bind(("", random.randint(10000, 40000)))            ###### revised by hs
+        
         ##############################################################################
         # TODO:  Register with the bootstrapper by calling the 'register' function   #
         #        Make sure you communicate to the B.S the serverport that this client#
         #        is running on to the bootstrapper.                                  #
         ##############################################################################
-
+        
+        self.register()                                                 ###### revised by hs
         
         ##############################################################################
         # TODO:  You can set status variable based on the status of the client:      #
@@ -88,6 +91,7 @@ class p2pclient:
         #        HINT: You may find enum datatype useful                             #
         ##############################################################################
         self.status = None
+        
 
         # 'log' variable is used to record the series of events that happen on the client
         # Empty list for now, update as we take actions
