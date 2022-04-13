@@ -4,7 +4,7 @@ import json
 import argparse
 
 if __name__ == "__main__":
-    client_id = None    # need to change to what..?
+    client_id = '1'    # need to change to what..?
     content = None
     actions = None
 
@@ -30,7 +30,7 @@ if __name__ == "__main__":
     
     #### Code added by HS ####
     Filename = client_id
-    Format = ".json"
+    Format = '.json'
     Filename = Filename + Format
     
     with open(Filename) as f:
