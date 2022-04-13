@@ -10,7 +10,11 @@ At end of each timestep, after all clients have completed their actions, log the
 }
 """
 import socket
-import time
+import threading
+import sys
+import pickle
+import json
+import random
 
 class p2pbootstrapper:
     def __init__(self, ip='127.0.0.1', port=8888):
@@ -18,13 +22,19 @@ class p2pbootstrapper:
         # TODO:  Initialize the socket object and bind it to the IP and port, refer  #
         #        https://docs.python.org/3/howto/sockets.html on how to do this.     #
         ##############################################################################
+        '''
         self.boots_socket = None
         self.clients = None  # None for now, will get updates as clients register
+        self.log = []       # Append the log to this variable.
+        '''
         
-        self.sock.connect((ip, port)) # bind to the IP and port
-        
-        # Append the log to this variable.
-        self.log = []
+        #### Code added by HS ####
+        self.boots_socket = None
+        self.clients = []  # None for now, will get updates as clients register
+        self.mutex = threading.Lock()        
+        self.boots_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.boots_socket.bind((ip, port))
+        #### Code added by HS ####
 
         # Timing variables:
         ###############################################################################################
@@ -44,9 +54,17 @@ class p2pbootstrapper:
         #        You will need to link each connecting client to a new thread (using #
         #        client_thread function below) to handle the requested action.       #
         ##############################################################################
-        pass
+        
+        #### Code added by HS ####
+        self.boots_socket.listen(5)
+        while True:
+            (clientsocket, (ip, port)) = self.boots_socket.accept()
+            clientThread = threading.Thread(target = self.client_thread, args = (clientsocket, ip, port))
+            clientThread.start()
+        #### Code added by HS ####
+        
 
-    def client_thread(self):
+    def client_thread(self, clientsocket, ip, port):
         ##############################################################################
         # TODO:  This function should handle the incoming connection requests from   #
         #        clients. You are free to add more arguments to this function based  #
@@ -55,14 +73,48 @@ class p2pbootstrapper:
         #        action needs to be done. For example, if the client wants to        #
         #        deregister, call self.deregister_client                             #
         ##############################################################################
-        pass
+        
+        #### Code added by HS ####
+        while True :
+            data = clientsocket.recv(1024).decode('utf-8')
+            data = data.replace('"', '')
+            
+            if data:
+                data_arr = data.split(" ")
+                client_id = data_arr[0]
+                data = data_arr[1]
+                ip = data_arr[2]
+                port = data_arr[3]
+                
+                if data == 'deregister' :
+                    self.deregister_client(client_id)
+                
+                elif data == 'register' :
+                    self.register_client(client_id, ip, port, clientsocket)
+                
+                elif data == 'sendList':
+                    client_list = self.return_clients()
+                    sorted_list = sorted(client_list, key=lambda x: x[0]) 
+                    toSend = json.dumps(sorted_list)
+                    clientsocket.send(toSend.encode('utf-8'))
+        #### Code added by HS ####
 
-    def register_client(self, client_id, ip, port):  
+        
+
+    def register_client(self, client_id, ip, port, clientsocket):  
         ########################################################################################
         # TODO:  Add client to self.clients, if already present, update status to 'registered  #
         ########################################################################################
-        pass
-
+        
+        #### Code added by HS ####
+        self.mutex.acquire()
+        self.clients.append((client_id, ip, port))
+        self.mutex.release()
+        
+        print("boostrapper clients register "+client_id)
+        print("     "+json.dumps(self.clients))
+        #### Code added by HS ####
+        
     def deregister_client(self, client_id):
         ##############################################################################
         # TODO:  Update status of client to 'deregisterd'                            #
@@ -74,15 +126,26 @@ class p2pbootstrapper:
         # TODO:  Return self.clients                                                 #
         ##############################################################################
         
-        return self.clients             ###### revised by hs
-        pass
+        #### Code added by HS ####
+        clients_copy = self.clients.copy()
+        return clients_copy
+        #### Code added by HS ####
 
     def start(self):
         ##############################################################################
         # TODO:  Start timer for all clients so clients can start performing their   #
         #        actions                                                             #
         ##############################################################################
-        pass
+        
+        #### Code added by HS ####
+        for client in self.clients:
+            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            client_socket.connect((client[1], int(client[2])))
+
+            toSend = str(str(20) + ' START '+ '127.0.0.1' +' '+str(8888))
+            client_socket.send(toSend.encode('utf-8'))
+            client_socket.close()
+        #### Code added by HS ####
 
     def process_action_complete(self, msg):
         ##############################################################################

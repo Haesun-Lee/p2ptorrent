@@ -23,8 +23,24 @@ if __name__ == "__main__":
     #        the p2pclient below                                                            #
     #########################################################################################
 
+    '''
+    Original code
     client = p2pclient(client_id=client_id, content=content, actions=actions)
+    '''
+    
+    #### Code added by HS ####
+    Filename = client_id
+    Format = ".json"
+    Filename = Filename + Format
+    
+    with open(Filename) as f:
+        client_id = json.load(f)
 
+    content = client_id['content']
+    actions = client_id['actions']
+    client = p2pclient(client_id=client_id, content=content, actions=actions)
+    #### Code added by HS ####
+    
     ##############################################################################
     # Now provided you have completed the steps in the p2pclient constructor     #
     # properly, steps                                                            #                  
