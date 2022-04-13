@@ -550,9 +550,16 @@ class p2pclient:
        
         #### Code added by HS ####
 
-    def purge_content(self, content_id):
+    def purge_content(self, content_id, curr_time):
         #####################################################################################################
         # TODO:  Delete the content from your content list                                                  #
         #        Append an entry to self.log that content is purged                                         #
         #####################################################################################################
-        pass
+        
+        #### Code added by HS ####
+        self.content.remove(content_id)
+        purge_dict = {}
+        purge_dict["time"] = curr_time
+        purge_dict["text"] = str("Removed "+str(content_id))
+        self.log.append(purge_dict)
+        #### Code added by HS ####

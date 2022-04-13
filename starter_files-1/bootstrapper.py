@@ -20,7 +20,7 @@ if __name__ == "__main__":
     bootst = p2pbootstrapper()
     listenThread = threading.Thread(target = bootst.start_listening, args = ())
     listenThread.start()
-    time.sleep(5)
+    time.sleep(10)
     bootst.start()
     #### Code added by HS ####
     
