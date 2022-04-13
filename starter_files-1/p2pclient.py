@@ -419,7 +419,7 @@ class p2pclient:
         
         #### Code added by HS ####
 
-    def query_client_for_content_list(self, client_id, curr_time, log = True)):
+    def query_client_for_content_list(self, client_id, curr_time, log = True):
         '''
         original code
         content_list = None
