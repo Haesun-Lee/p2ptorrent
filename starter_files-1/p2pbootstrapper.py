@@ -56,11 +56,13 @@ class p2pbootstrapper:
         ##############################################################################
         
         #### Code added by HS ####
-        self.boots_socket.listen(5)
+        
+        self.boots_socket.listen(20)     # how many client should I be listening?
         while True:
             (clientsocket, (ip, port)) = self.boots_socket.accept()
             clientThread = threading.Thread(target = self.client_thread, args = (clientsocket, ip, port))
             clientThread.start()
+        
         #### Code added by HS ####
         
 
