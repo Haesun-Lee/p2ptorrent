@@ -100,7 +100,7 @@ class p2pclient:
         self.socket = None
         '''
         #### Code added by HS ####
-        time.sleep(.1)
+        time.sleep(0.5)
         self.p2pclientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         random.seed(client_id)
         self.port = random.randint(9000, 9999)
@@ -188,7 +188,7 @@ class p2pclient:
             data = clientsocket.recv(1024).decode('utf-8')
             data = data.replace('"', '')
             if data:
-                print("p2pclient_thread data: " +data)
+                #print("p2pclient_thread data: " +data)
                 data_arr = data.split(" ")
                 data = data_arr[1]
                 ip = data_arr[2]
@@ -197,7 +197,7 @@ class p2pclient:
                 if data == 'START':
                     self.start()
                 
-                if data == 'knownClientsPlease' :
+                if data == 'knownClientsQuery' :
                     client_list = self.return_list_of_known_clients() 
                     toSend = json.dumps(client_list)
                     clientsocket.send(toSend.encode('utf-8'))
@@ -205,7 +205,7 @@ class p2pclient:
                 elif data == 'contentList' :
                     content_list = self.return_content_list()
                     toSend = json.dumps(content_list)
-                    print("got send content list flag sending: "+ str(self.client_id) +" " +toSend)
+                    #print("content list : "+ str(self.client_id) +" " +toSend)
                     clientsocket.send(toSend.encode('utf-8'))
                     
         #### Code added by HS ####
@@ -225,7 +225,7 @@ class p2pclient:
         bootstrapperSocket.close()
         
         if curr_time != 0:
-            register_dict = {}
+            register_dict = {}          # make register dictionary
             register_dict["time"] = curr_time
             register_dict["text"] = str("Client ID " +str(self.client_id)+" registered")
             self.log.append(register_dict)
@@ -245,10 +245,11 @@ class p2pclient:
         bootstrapperSocket.send(toSend.encode('utf-8'))
         bootstrapperSocket.close()
         
-        dereg_dict = {}
-        dereg_dict["time"] = curr_time
-        dereg_dict["text"] = "Unregistered"
-        self.log.append(dereg_dict)
+        # should I also put if curr_time != 0 :
+        deregister_dict = {}            # make deregister dictionary
+        deregister_dict["time"] = curr_time
+        deregister_dict["text"] = "Unregistered"
+        self.log.append(deregister_dict)
         #### Code added by HS ####
 
     def start(self):
@@ -280,13 +281,16 @@ class p2pclient:
             
             code = self.actions[action_num]["code"]
             
-            if code == "R":
+            if code == "R":     # Register itself with the p2ptracker. send clientID
                 self.register(curr_time)
             
-            elif code == "U":
+            elif code == "U":   # Unregister itself from the p2ptracker.
                 self.deregister(curr_time)
             
-            elif code == "Q":
+            elif code == "L":   # Obtain a list of all clients from bootstrapper. Get clientID, IP, and Port
+                self.query_bootstrapper_all_clients(curr_time)
+            
+            elif code == "Q":   # Request a data object
                 self.request_content(self.actions[action_num]["content_id"], curr_time)
             
             elif code == "P":
@@ -297,9 +301,7 @@ class p2pclient:
             
             elif code == "M":
                 self.query_client_for_content_list(self.actions[action_num]["client_id"], curr_time)
-            
-            elif code == "L":
-                self.query_bootstrapper_all_clients(curr_time)
+
             
             action_num += 1
             while_end = time.time()
@@ -376,7 +378,7 @@ class p2pclient:
         if len(correctClient) > 0:
             otherClientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             otherClientSocket.connect((correctClient[1], int(correctClient[2])))
-            toSend = str(str(self.client_id) + ' knownClientsPlease '+ '127.0.0.1' +' '+str(self.port))
+            toSend = str(str(self.client_id) + ' knownClientsQuery '+ '127.0.0.1' +' '+str(self.port))
             otherClientSocket.send(toSend.encode('utf-8'))
             data = otherClientSocket.recv(1048).decode('utf-8')
             otherClientSocket.close()
