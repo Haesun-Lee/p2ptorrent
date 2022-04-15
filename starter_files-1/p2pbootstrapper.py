@@ -16,8 +16,10 @@ import pickle
 import json
 import random
 
+PORTNUMBER = 8888
+
 class p2pbootstrapper:
-    def __init__(self, ip='127.0.0.1', port=8888):
+    def __init__(self, ip='127.0.0.1', port=PORTNUMBER):
         ##############################################################################
         # TODO:  Initialize the socket object and bind it to the IP and port, refer  #
         #        https://docs.python.org/3/howto/sockets.html on how to do this.     #
@@ -78,9 +80,11 @@ class p2pbootstrapper:
         
         #### Code added by HS ####
         while True :
+            print("#################################")
             data = clientsocket.recv(1024).decode('utf-8')
+            print("################################# data : " +data)
             data = data.replace('"', '')
-            
+            print("################################# after data : " +data)
             if data:
                 data_arr = data.split(" ")
                 client_id = data_arr[0]
@@ -144,7 +148,7 @@ class p2pbootstrapper:
             client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             client_socket.connect((client[1], int(client[2])))
 
-            toSend = str(str(20) + ' START '+ '127.0.0.1' +' '+str(8888))
+            toSend = str(str(20) + ' START '+ '127.0.0.1' +' '+str(PORTNUMBER))
             client_socket.send(toSend.encode('utf-8'))
             client_socket.close()
         #### Code added by HS ####

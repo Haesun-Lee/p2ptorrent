@@ -3,8 +3,16 @@ from p2pclient import p2pclient
 import json
 import argparse
 
+
 if __name__ == "__main__":
-    client_id = None    # need to change to what..?
+    parser = argparse.ArgumentParser(description='p2p bit torrent') 
+    parser.add_argument('--file')
+    args = parser.parse_args()
+    #print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    #print(args.file)
+    temp = args.file.split(".")
+    client_id = temp[0]
+    #print(client_id)
     content = None
     actions = None
 
@@ -27,18 +35,18 @@ if __name__ == "__main__":
     Original code
     client = p2pclient(client_id=client_id, content=content, actions=actions)
     '''
-    
+    temp_client_id = client_id
     #### Code added by HS ####
-    Filename = client_id
+    Filename = str(client_id)
     Format = '.json'
     Filename = Filename + Format
-    
+    print("File name : " + Filename)
     with open(Filename) as f:
         client_id = json.load(f)
 
     content = client_id['content']
     actions = client_id['actions']
-    client = p2pclient(client_id=client_id, content=content, actions=actions)
+    client = p2pclient(client_id=client_id, content=content, actions=actions, temp = temp_client_id)
     #### Code added by HS ####
     
     ##############################################################################

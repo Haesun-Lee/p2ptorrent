@@ -54,6 +54,8 @@ import pickle
 import threading
 import struct 
 
+PORTNUMBER = 8888
+
  #### Code added by HS ####
 class Status(Enum):
             INITIAL = 0
@@ -62,7 +64,7 @@ class Status(Enum):
  #### Code added by HS ####
 
 class p2pclient:
-    def __init__(self, client_id, content, actions):
+    def __init__(self, client_id, content, actions, temp):
         
         ##############################################################################
         # TODO: Initialize the class variables with the arguments coming             #
@@ -74,7 +76,6 @@ class p2pclient:
         self.client_id = None
         self.content = None
         self.actions = None  # this list of actions that the client needs to execute
-
         self.content_originator_list = None  # None for now, it will be built eventually
         '''
         
@@ -102,8 +103,9 @@ class p2pclient:
         #### Code added by HS ####
         time.sleep(0.5)
         self.p2pclientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        random.seed(client_id)
-        self.port = random.randint(9000, 9999)
+        random.seed(int(temp))
+        #random.seed(1)
+        self.port = random.randint(4000, 9999)
         self.p2pclientsocket.bind(('127.0.0.1', self.port))
         #### Code added by HS ####
         
@@ -210,7 +212,7 @@ class p2pclient:
                     
         #### Code added by HS ####
         
-    def register(self, curr_time, ip='127.0.0.1', port=8888):
+    def register(self, curr_time, ip='127.0.0.1', port=PORTNUMBER):
         ##############################################################################
         # TODO:  Register with the bootstrapper. Make sure you communicate the server#
         #        port that this client is running on to the bootstrapper.            #
@@ -232,7 +234,7 @@ class p2pclient:
         #### Code added by HS ####
         
 
-    def deregister(self, curr_time, ip='127.0.0.1', port=8888):
+    def deregister(self, curr_time, ip='127.0.0.1', port=PORTNUMBER):
         ##############################################################################
         # TODO:  Deregister/re-register with the bootstrapper                        #
         #        Append an entry to self.log that deregistration is successful       #
@@ -281,7 +283,7 @@ class p2pclient:
             
             code = self.actions[action_num]["code"]
             
-            if code == "R":     # Register itself with the p2ptracker. send clientID
+            if code == "R":     # Register itself with the p2ptracker. send clientID.
                 self.register(curr_time)
             
             elif code == "U":   # Unregister itself from the p2ptracker.
@@ -290,16 +292,16 @@ class p2pclient:
             elif code == "L":   # Obtain a list of all clients from bootstrapper. Get clientID, IP, and Port
                 self.query_bootstrapper_all_clients(curr_time)
             
-            elif code == "Q":   # Request a data object
+            elif code == "Q":   # Request a data object.
                 self.request_content(self.actions[action_num]["content_id"], curr_time)
             
-            elif code == "P":
+            elif code == "P":   # Purge(remove) data object from bootstrapper(but retain it in the COL).
                 self.purge_content(self.actions[action_num]["content_id"], curr_time)    
             
-            elif code == "O":
+            elif code == "O":   # Obtain a list of all other clients known to a particular client(ClientID) .
                 self.query_client_for_known_client(self.actions[action_num]["client_id"], curr_time)
             
-            elif code == "M":
+            elif code == "M":   # obtain a list of all data object hashes from a particular client. 
                 self.query_client_for_content_list(self.actions[action_num]["client_id"], curr_time)
 
             
@@ -316,7 +318,7 @@ class p2pclient:
         
 
     #TODO: clarify on logging
-    def query_bootstrapper_all_clients(self,curr_time, log = True, ip='127.0.0.1', port=8888):
+    def query_bootstrapper_all_clients(self,curr_time, log = True, ip='127.0.0.1', port=PORTNUMBER):
         ##############################################################################
         # TODO:  Use the connection to ask the bootstrapper for the list of clients  #
         #        registered clients.                                                 #
@@ -350,7 +352,7 @@ class p2pclient:
         
 
     #TODO: clarify on logging
-    def query_client_for_known_client(self, client_id, curr_time, log = True, ip='127.0.0.1', port=8888):
+    def query_client_for_known_client(self, client_id, curr_time, log = True, ip='127.0.0.1', port=PORTNUMBER):
         '''
         original code
         client_list = None
@@ -382,6 +384,7 @@ class p2pclient:
             otherClientSocket.send(toSend.encode('utf-8'))
             data = otherClientSocket.recv(1048).decode('utf-8')
             otherClientSocket.close()
+            
             clientDataToList = json.loads(data)
             newData = data.replace('[','<').replace(']','>').replace('\"','')
             newestData = newData[1:len(newData)-1]
@@ -441,7 +444,7 @@ class p2pclient:
         count = 0
         for client in bootstrapperClients:
             if client[0] == client_id:
-                print("client: "+str(self.client_id)+ " found correct client at: "+ str(count) + " " +str(client[0]) + " " + client[1] + " " + str(client[2]))
+                #print("client: "+str(self.client_id)+ " found correct client at: "+ str(count) + " " +str(client[0]) + " " + client[1] + " " + str(client[2]))
                 correctClient = client
                 break
             count += 1
