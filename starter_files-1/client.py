@@ -59,7 +59,7 @@ if __name__ == "__main__":
     ##############################################################################
     # TODO: For step 4: call clients.start_listening()                           #
     ##############################################################################
-
+    client.start_listening()
     ##############################################################################
     # For step 5: the bootstrapper will call the start() on this client, which  #
     # will make this client start taking its actions.                            #
