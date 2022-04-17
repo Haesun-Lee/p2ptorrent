@@ -205,13 +205,13 @@ class p2pclient:
                 if data == 'knownClientsQuery' :
                     client_list = self.return_list_of_known_clients() 
                     toSend = json.dumps(client_list)
-                    clientsocket.send(toSend.encode('utf-8'))
+                    clientsocket.send(toSend.encode())
                 
                 elif data == 'contentList' :
                     content_list = self.return_content_list()
                     toSend = json.dumps(content_list)
                     #print("content list : "+ str(self.client_id) +" " +toSend)
-                    clientsocket.send(toSend.encode('utf-8'))
+                    clientsocket.send(toSend.encode())
                     
         #### Code added by HS ####
         
@@ -229,7 +229,7 @@ class p2pclient:
         
         toSend = str(str(self.client_id) + ' register '+ str(ip) +' '+str(self.port))
         print(toSend)
-        bootstrapperSocket.send(toSend.encode('utf-8'))
+        bootstrapperSocket.send(toSend.encode())
         bootstrapperSocket.close()
         
         if curr_time == 0:
@@ -251,7 +251,7 @@ class p2pclient:
         bootstrapperSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         bootstrapperSocket.connect((ip, port))
         toSend = str(str(self.client_id) + ' deregister '+ str(ip) +' '+str(self.port))
-        bootstrapperSocket.send(toSend.encode('utf-8'))
+        bootstrapperSocket.send(toSend.encode())
         bootstrapperSocket.close()
         
         # should I also put if curr_time != 0 :
@@ -342,8 +342,8 @@ class p2pclient:
         toSend = str(str(self.client_id) + ' sendList '+ '127.0.0.1' +' '+str(self.port))
         print("******************** bootstrapper query to send ***********************")
         print(toSend)
-        bootstrapperSocket.send(toSend.encode('utf-8'))
-        data = bootstrapperSocket.recv(1048).decode('utf-8')
+        bootstrapperSocket.send(toSend.encode())
+        data = bootstrapperSocket.recv(1048).decode()
         bootstrapperSocket.close()
         
         clientDataToList = json.loads(data)
@@ -392,8 +392,8 @@ class p2pclient:
             toSend = str(str(self.client_id) + ' knownClientsQuery '+ '127.0.0.1' +' '+str(self.port))
             print("********************known client query to send ***********************")
             print(toSend)
-            otherClientSocket.send(toSend.encode('utf-8'))
-            data = otherClientSocket.recv(1048).decode('utf-8')
+            otherClientSocket.send(toSend.encode())
+            data = otherClientSocket.recv(1048).decode()
             otherClientSocket.close()
             
             clientDataToList = json.loads(data)
@@ -468,8 +468,8 @@ class p2pclient:
             toSend = str(str(self.client_id) + ' contentList '+ '127.0.0.1' +' '+str(self.port))
             print("******************** client for content list query to send ***********************")
             print(toSend)
-            otherClientSocket.send(toSend.encode('utf-8'))
-            data = otherClientSocket.recv(1048).decode('utf-8')
+            otherClientSocket.send(toSend.encode())
+            data = otherClientSocket.recv(1048).decode()
             otherClientSocket.close()
             print("content list from client: "+str(client_id)+ " "+data)
             
@@ -533,6 +533,10 @@ class p2pclient:
                 in_col = None
                 
                 for content in contentList:
+                    print("##########################")
+                    #print(client[0])
+                    #print(client[1])
+                    #print(client[2])
                     self.content_originator_list[content] = [client[0], client[1], client[2]]    
                     if content == content_id:
                         print("found content in "+str(client[0]))
@@ -564,7 +568,7 @@ class p2pclient:
         q_dict = {}
         q_dict["time"] = curr_time
         #q_dict["text"] = str("Obtained "+str(content_id)+" from " + correctContentClient[1] + "#" + correctContentClient[2])
-        q_dict["text"] = str("Obtained "+str(content_id)+" from " + '127.0.0.1' + "#" + str(self.port))
+        q_dict["text"] = str("Obtained "+str(content_id)+" from " + '127.0.0.1' + "#" + str(client[2]))
         
         self.log.append(q_dict)
        

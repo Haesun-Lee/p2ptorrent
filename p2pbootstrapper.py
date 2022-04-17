@@ -81,7 +81,7 @@ class p2pbootstrapper:
         #### Code added by HS ####
         while True :
             #print("#################################")
-            data = clientsocket.recv(1024).decode('utf-8')
+            data = clientsocket.recv(1024).decode()
             print(data)
             #print("################################# data : " +data)
             data = data.replace('"', '')
@@ -103,7 +103,7 @@ class p2pbootstrapper:
                     client_list = self.return_clients()
                     sorted_list = sorted(client_list, key=lambda x: x[0]) 
                     toSend = json.dumps(sorted_list)
-                    clientsocket.send(toSend.encode('utf-8'))
+                    clientsocket.send(toSend.encode())
         #### Code added by HS ####
 
         
@@ -150,7 +150,7 @@ class p2pbootstrapper:
             client_socket.connect((client[1], int(client[2])))
 
             toSend = str(str(0) + ' START '+ '127.0.0.1' +' '+str(PORTNUMBER))
-            client_socket.send(toSend.encode('utf-8'))
+            client_socket.send(toSend.encode())
             client_socket.close()
         #### Code added by HS ####
 
