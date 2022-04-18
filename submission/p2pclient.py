@@ -227,7 +227,7 @@ class p2pclient:
         bootstrapperSocket.connect((ip, port))
         #print("what"+ip)
         
-        toSend = str(str(self.client_id) + ' register '+ str(ip) +' '+str(self.port) +' '+ str(curr_time))
+        toSend = str(str(self.client_id) + ' register '+ str(ip) +' '+str(self.port))
         print(toSend)
         bootstrapperSocket.send(toSend.encode())
         bootstrapperSocket.close()
@@ -300,7 +300,6 @@ class p2pclient:
                 self.query_bootstrapper_all_clients(curr_time)
             
             elif code == "Q":   # Request a data object.
-                print("REQUEST")
                 self.request_content(self.actions[action_num]["content_id"], curr_time)
             
             elif code == "P":   # Purge(remove) data object from bootstrapper(but retain it in the COL).
@@ -456,9 +455,8 @@ class p2pclient:
         count = 0
         for client in bootstrapperClients:
             if client[0] == client_id:
-                print("client: "+str(self.client_id)+ " found correct client at: "+ str(count) + " " +str(client[0]) + " " + client[1] + " " + str(client[2]))
+                #print("client: "+str(self.client_id)+ " found correct client at: "+ str(count) + " " +str(client[0]) + " " + client[1] + " " + str(client[2]))
                 correctClient = client
-                #print("correctClinet", correctClient)
                 break
             count += 1
 
@@ -469,7 +467,6 @@ class p2pclient:
             otherClientSocket.connect((correctClient[1], int(correctClient[2])))
             toSend = str(str(self.client_id) + ' contentList '+ '127.0.0.1' +' '+str(self.port))
             print("******************** client for content list query to send ***********************")
-            print("query function port: ", self.port)
             print(toSend)
             otherClientSocket.send(toSend.encode())
             data = otherClientSocket.recv(1048).decode()
@@ -486,8 +483,6 @@ class p2pclient:
                 q_dict['text'] = "Client " + str(client_id) + ": " + newestData
                 self.log.append(q_dict)
                 print("end of logging")
-            
-            print("******************************",clientDataToList)
             return clientDataToList
         
         #### Code added by HS ####
@@ -521,19 +516,15 @@ class p2pclient:
         found = False
         loop_count = 0   
         list_of_ids = [i[0] for i in bootstrapperClients]
-        print("----------------------------------------------------------")
         print("list of ids "+json.dumps(list_of_ids))
         while not found and client_index < len(bootstrapperClients) and loop_count < 10:
             print("Client index "+str(client_index) + " " + str(len(bootstrapperClients)))
             client = bootstrapperClients[client_index]
-            print("bootstrapperClients:" , bootstrapperClients[client_index])
             print("Client: "+str(self.client_id)+" Looking at client: "+str(client[0]))
             
             if client[0] != self.client_id:
-                print("client[0] ", client[0], "!= ", self.client_id)
                 contentList = self.query_client_for_content_list(client[0],curr_time, log=False)
-                print("contentLIst is request", contentList)
-                #  doy you have specific content -> 
+                
                 if not contentList:
                     print("content list is empty "+str(client[0]))
                     break
@@ -542,11 +533,11 @@ class p2pclient:
                 in_col = None
                 
                 for content in contentList:
-                    print("########Content ID CHECKING ###############")
-                    print("content", content, "client[0] : ",client[0], "client[1] :  ",client[1], "client[2] :  ",client[2])
-
-                    self.content_originator_list[content] = [client[0], client[1], client[2]]  
-                    print("This is content_originator_list," , "client[0] : ",client[0], "client[1] :  ",client[1], "client[2] :  ",client[2])  
+                    print("##########################")
+                    #print(client[0])
+                    #print(client[1])
+                    #print(client[2])
+                    self.content_originator_list[content] = [client[0], client[1], client[2]]    
                     if content == content_id:
                         print("found content in "+str(client[0]))
                         correctContentClient = [client[0], client[1], client[2]]
@@ -573,22 +564,13 @@ class p2pclient:
         content_copy.append(content_id)
         self.content = content_copy
         print("just added new content to client_id: "+str(self.client_id)+ " " + json.dumps(self.content))
+        
         q_dict = {}
         q_dict["time"] = curr_time
         #q_dict["text"] = str("Obtained "+str(content_id)+" from " + correctContentClient[1] + "#" + correctContentClient[2])
         q_dict["text"] = str("Obtained "+str(content_id)+" from " + '127.0.0.1' + "#" + str(client[2]))
         
         self.log.append(q_dict)
-        
-        bootstrapperSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        bootstrapperSocket.connect(('127.0.0.1', self.port))
-        #print("what"+ip)
-        '''
-        toSend = str(str(self.client_id) + 'done'+ str('127.0.0.1') +' '+str(self.port))
-        print(toSend)
-        bootstrapperSocket.send(toSend.encode())
-        bootstrapperSocket.close()
-        '''
        
         #### Code added by HS ####
 

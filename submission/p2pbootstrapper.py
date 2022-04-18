@@ -19,7 +19,6 @@ import random
 PORTNUMBER = 8823
 
 class p2pbootstrapper:
-    
     def __init__(self, ip='127.0.0.1', port=PORTNUMBER):
         ##############################################################################
         # TODO:  Initialize the socket object and bind it to the IP and port, refer  #
@@ -38,9 +37,6 @@ class p2pbootstrapper:
         self.boots_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.boots_socket.bind((ip, port))
         #### Code added by HS ####
-        self.log = []
-        
-        
 
         # Timing variables:
         ###############################################################################################
@@ -86,7 +82,7 @@ class p2pbootstrapper:
         while True :
             #print("#################################")
             data = clientsocket.recv(1024).decode()
-            print("this is data",data)
+            print(data)
             #print("################################# data : " +data)
             data = data.replace('"', '')
             #print("################################# after data : " +data)
@@ -96,35 +92,19 @@ class p2pbootstrapper:
                 data = data_arr[1]
                 ip = data_arr[2]
                 port = data_arr[3]
-                #time = data_arr[4]
-                
                 
                 if data == 'deregister' :
                     self.deregister_client(client_id)
                 
                 elif data == 'register' :
                     self.register_client(client_id, ip, port, clientsocket)
-                   
-                    q_dict = {}
-                    q_dict['time'] = 0
-                    print("Clients registered: <"+ client_id +" "+  ip + ", " + port +">")
-                    q_dict['text'] = "Clients registered: <"+ client_id +" "+  ip + ", " + port +">"
-                    self.log.append(q_dict)
-                    
                 
                 elif data == 'sendList':
                     client_list = self.return_clients()
                     sorted_list = sorted(client_list, key=lambda x: x[0]) 
                     toSend = json.dumps(sorted_list)
                     clientsocket.send(toSend.encode())
-                # elif data == 'done':
-                #   print("cliend_id :" + client_id, "ip: " + ip, "port: " + port)
                 break
-            
-        string = "bootstrapper.json"
-        outfile = open(string, "w")
-        json.dump(self.log, outfile)
-        outfile.close()
         #### Code added by HS ####
 
         
