@@ -535,7 +535,7 @@ class p2pclient:
                 print("contentLIst is request", contentList)
                 #  doy you have specific content -> 
                 if not contentList:
-                    print("content list is empty "+str(client[0]))
+                    #print("content list is empty "+str(client[0]))
                     break
                 
                 in_content_list = False
@@ -543,19 +543,23 @@ class p2pclient:
                 
                 for content in contentList:
                     print("########Content ID CHECKING ###############")
-                    print("content", content, "client[0] : ",client[0], "client[1] :  ",client[1], "client[2] :  ",client[2])
+                    #print("content", content, "client[0] : ",client[0], "client[1] :  ",client[1], "client[2] :  ",client[2])
 
                     self.content_originator_list[content] = [client[0], client[1], client[2]]  
-                    print("This is content_originator_list," , "client[0] : ",client[0], "client[1] :  ",client[1], "client[2] :  ",client[2])  
+                    print("This is content_originator_list," , self.content_originator_list[content])  
+                    print(content +"          "+ content_id)
                     if content == content_id:
                         print("found content in "+str(client[0]))
                         correctContentClient = [client[0], client[1], client[2]]
                         found = True
                         in_content_list = True
                         break
-                
+                               
                 if not in_content_list:
+                    print("looking at the col ")
+                    print(content_id)
                     if content_id in self.content_originator_list:
+                        print("am i here...?")
                         in_col = self.content_originator_list[content_id]
                         hint = in_col[0]
                         print("found hint at client_id "+str(hint))
